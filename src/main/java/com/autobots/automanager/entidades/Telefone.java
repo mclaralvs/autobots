@@ -1,5 +1,7 @@
 package com.autobots.automanager.entidades;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -22,4 +24,8 @@ public class Telefone {
 	@Column
 	private String numero;
 
+	public List<Telefone> getTelefones() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
