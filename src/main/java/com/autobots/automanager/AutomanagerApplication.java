@@ -33,7 +33,7 @@ public class AutomanagerApplication {
 			calendario.set(2002, 05, 15);
 
 			Cliente cliente = new Cliente();
-			cliente.setNome("Pedro AlcÃ¢ntara de BraganÃ§a e Bourbon");
+			cliente.setNome("Pedro Alcântara de Bragança e Bourbon");
 			cliente.setDataCadastro(Calendar.getInstance().getTime());
 			cliente.setDataNascimento(calendario.getTime());
 			cliente.setNomeSocial("Dom Pedro");

@@ -120,6 +120,5 @@ public class EnderecoControle {
 			status = HttpStatus.BAD_REQUEST;
 		}		
 		
-		//return new ResponseEntity<>(status);
 	}
 }

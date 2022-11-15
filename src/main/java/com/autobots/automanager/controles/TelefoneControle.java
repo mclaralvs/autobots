@@ -3,6 +3,8 @@ package com.autobots.automanager.controles;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.autobots.automanager.entidades.Cliente;
 import com.autobots.automanager.entidades.Telefone;
+import com.autobots.automanager.modelos.AdicionadorLink;
+import com.autobots.automanager.modelos.AdicionadorLinkTelefone;
+import com.autobots.automanager.modelos.ClienteSelecionador;
+import com.autobots.automanager.modelos.TelefoneAtualizador;
+import com.autobots.automanager.modelos.TelefoneSelecionador;
 import com.autobots.automanager.repositorios.TelefoneRepositorio;
 import com.autobots.automanager.repositorios.ClienteRepositorio;
 
@@ -22,54 +29,105 @@ public class TelefoneControle {
 	
 	@Autowired
 	private TelefoneRepositorio repositorioTelefone;
+	
+	@Autowired
+	private TelefoneSelecionador selecionadorTelefone;
 
 	@Autowired
 	private ClienteRepositorio repositorio;
 	
+	@Autowired
+	private ClienteSelecionador selecionador;
+	
+	@Autowired
+	private AdicionadorLinkTelefone adicionadorLink;
+	
 	@GetMapping("/telefones")
-	public List<Telefone> obterTelefone() {
-		return repositorioTelefone.findAll();
+	public ResponseEntity<List<Telefone>> obterTelefone() {
+		List<Telefone> telefones = repositorioTelefone.findAll();
+		
+		if (telefones.isEmpty()) {
+			ResponseEntity<List<Telefone>> resposta = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			
+			return resposta;
+			
+		} else {
+			adicionadorLink.adicionarLink(telefones);
+			
+			ResponseEntity<List<Telefone>> resposta = new ResponseEntity<>(telefones, HttpStatus.FOUND);
+			
+			return resposta;
+		}
 	}
 	
 	@GetMapping("/telefones/{id}")
-	public List<Telefone> telefonesCliente(@PathVariable Long id) {
-		Cliente alvo = repositorio.getById(id);
-		return alvo.getTelefones();
+	public ResponseEntity<Telefone> telefonesCliente(@PathVariable Long id) {
+		List<Telefone> telefones = repositorioTelefone.findAll();
+		
+		Telefone telefone = selecionadorTelefone.selecionar(telefones, id);
+		
+		if (telefone == null) {
+			ResponseEntity<Telefone> resposta = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			
+			return resposta;
+			
+		} else {
+			adicionadorLink.adicionarLink(telefone);
+			
+			ResponseEntity<Telefone> resposta = new ResponseEntity<Telefone>(telefone, HttpStatus.FOUND);
+			
+			return resposta;
+		}
 	}
 
 	@PutMapping("/cadastrar/{id}") // só pra atualizacao
-	public void cadastrarTelefone(@PathVariable long id, @RequestBody Cliente atualizacao) {
-		Cliente alvo = repositorio.getById(id);
-		alvo.getTelefones().addAll(atualizacao.getTelefones());
-		repositorio.save(alvo);
+	public ResponseEntity<?> cadastrarTelefone(@PathVariable long id, @RequestBody Telefone atualizacao) {
+		HttpStatus status = HttpStatus.CONFLICT;
+		
+		Telefone alvo = repositorioTelefone.getById(atualizacao.getId());
+		
+		TelefoneAtualizador atualizador = new TelefoneAtualizador();
+		
+		if (alvo != null) {
+			atualizador.atualizar(alvo, atualizacao);
+			
+			repositorioTelefone.save(alvo);
+			
+			status = HttpStatus.OK;
+			
+		} else {
+			status = HttpStatus.BAD_REQUEST;
+		}
+		
+		return new ResponseEntity<>(status);
 	}
-	
-	/*@PutMapping("/atualizar")
-	public void atualizarTelefone(@RequestBody Cliente atualizacao) {
-		Cliente alvo = repositorio.getById(atualizacao.getId());
-		
-		List<Telefone> telefones =  alvo.getTelefones();
-		
-		for (Telefone telefone: telefones) {
-			if (telefone.getId() ==  )
-			TelefoneAtualizador atualizador = new TelefoneAtualizador();
-			atualizador.atualizar(telefone, atualizarTelefone(atualizacao));
-		}		
-		repositorio.save(alvo);
-	}*/
 	
 	@DeleteMapping("/excluir/{id}")
 	public void excluirDocumento(@PathVariable long id, @RequestBody Cliente exclusao) {
+		HttpStatus status = HttpStatus.CONFLICT;
+		
 		Cliente alvo = repositorio.getById(id); // informar o id por json
 		
-		List<Telefone> telefones =  alvo.getTelefones(); //pega todos os documentos e salva numa variável
-		
-		for (Telefone telefone: telefones) { // vai percorrer pela variável inteira
-			if (telefone.getId() == exclusao.getTelefones().get(0).getId()) {
-				alvo.getTelefones().remove(telefone);
-				break;
+		if (alvo != null) {
+			List<Telefone> telefones =  alvo.getTelefones(); //pega todos os documentos e salva numa variável
+			
+			for (Telefone telefone: telefones) { // vai percorrer pela variável inteira
+			
+				if (telefone.getId() == exclusao.getTelefones().get(0).getId()) {
+					alvo.getTelefones().remove(telefone);
+				
+					break;
+				}
 			}
+			
+			repositorio.save(alvo); // atualiza no banco
+			
+			status = HttpStatus.OK;
+			
+		} else {
+			status = HttpStatus.BAD_REQUEST;
 		}
-		repositorio.save(alvo); // atualiza no banco
+		
+
 	}
 }
