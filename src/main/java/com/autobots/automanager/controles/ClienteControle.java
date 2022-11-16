@@ -22,8 +22,8 @@ import com.autobots.automanager.repositorios.ClienteRepositorio;
 
 @RestController
 @RequestMapping("/cliente")
-public class ClienteControle 
-{
+public class ClienteControle {
+	
 	@Autowired
 	private ClienteRepositorio repositorio;
 	
@@ -71,39 +71,53 @@ public class ClienteControle
 		}
 	}
 
-	@PostMapping("/cliente/cadastro")
+	@PostMapping("/cadastro")
 	public ResponseEntity<?> cadastrarCliente(@RequestBody Cliente cliente) {
 		HttpStatus status = HttpStatus.CONFLICT;
+		
 		if (cliente.getId() == null) {
 			repositorio.save(cliente);
+		
 			status = HttpStatus.CREATED;
 		}
+		
 		return new ResponseEntity<>(status);
 	}
 
-	@PutMapping("/cliente/atualizar")
+	@PutMapping("/atualizar")
 	public ResponseEntity<?> atualizarCliente(@RequestBody Cliente atualizacao) {
 		HttpStatus status = HttpStatus.CONFLICT;
-		Cliente cliente = repositorio.getById(atualizacao.getId());
-		if (cliente != null) {
+		
+		Cliente alvo = repositorio.getById(atualizacao.getId());
+		
+		if (alvo != null) {
 			ClienteAtualizador atualizador = new ClienteAtualizador();
-			atualizador.atualizar(cliente, atualizacao);
-			repositorio.save(cliente);
+		
+			atualizador.atualizar(alvo, atualizacao);
+			
+			repositorio.save(alvo);
+			
 			status = HttpStatus.OK;
+		
 		} else {
 			status = HttpStatus.BAD_REQUEST;
 		}
+		
 		return new ResponseEntity<>(status);
 	}
 
-	@DeleteMapping("/cliente/excluir")
+	@DeleteMapping("/excluir")
 	public ResponseEntity<?> excluirCliente(@RequestBody Cliente exclusao) {
 		HttpStatus status = HttpStatus.BAD_REQUEST;
+		
 		Cliente cliente = repositorio.getById(exclusao.getId());
+		
 		if (cliente != null) {
 			repositorio.delete(cliente);
+			
 			status = HttpStatus.OK;
 		}
+		
 		return new ResponseEntity<>(status);
 	}
 }

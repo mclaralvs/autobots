@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.autobots.automanager.entidades.Cliente;
+import com.autobots.automanager.entidades.Documento;
 import com.autobots.automanager.entidades.Endereco;
 import com.autobots.automanager.modelos.AdicionadorLinkEndereco;
 import com.autobots.automanager.modelos.ClienteSelecionador;
@@ -59,7 +60,7 @@ public class EnderecoControle {
 		}
 	}
 	
-	@GetMapping("/enderecos/{id}")
+	@GetMapping("/endereco/{id}")
 	public ResponseEntity<Endereco> enderecosCliente(@PathVariable long id) {
 		List<Endereco> enderecos = repositorioEndereco.findAll();
 		
@@ -80,32 +81,30 @@ public class EnderecoControle {
 	}
 	
 	@PutMapping("/cadastrar/{id}") // só pra atualizacao
-	public ResponseEntity<?> cadastrarEndereco(@PathVariable long id, @RequestBody Endereco atualizacao) {
+	public ResponseEntity<?> cadastrarEndereco(@PathVariable long id, @RequestBody Cliente cliente) {
 		HttpStatus status = HttpStatus.CONFLICT;
 		
-		Endereco alvo = repositorioEndereco.getById(atualizacao.getId());
+		Cliente alvo = repositorio.getById(id);
 		
-		EnderecoAtualizador atualizador = new EnderecoAtualizador();
-		
-		if (alvo != null) {
-			atualizador.atualizar(alvo, atualizacao);
+		if (alvo.getEndereco() == null) {
+			alvo.setEndereco(cliente.getEndereco());
 			
-			repositorioEndereco.save(alvo);
+			repositorio.save(alvo);
 			
 			status = HttpStatus.OK;
 			
 		} else {
-			status = HttpStatus.BAD_REQUEST;
+			status = HttpStatus.CONFLICT;
 		}
 		
 		return new ResponseEntity<>(status);
 	}
 	
-	@DeleteMapping("/excluir/{id}")
-	public void excluirEndereco(@PathVariable long id, @RequestBody Cliente exclusao) {
-		HttpStatus status = HttpStatus.CONFLICT;
+	@DeleteMapping("/excluir")
+	public ResponseEntity<?> excluirEndereco(@RequestBody Cliente exclusao) {
+		HttpStatus status = HttpStatus.BAD_REQUEST;
 		
-		Cliente alvo = repositorio.getById(id); 
+		Cliente alvo = repositorio.getById(exclusao.getId());
 		
 		if (alvo != null) {
 			repositorioEndereco.delete(alvo.getEndereco());
@@ -116,9 +115,8 @@ public class EnderecoControle {
 			
 			status = HttpStatus.OK;
 			
-		} else {
-			status = HttpStatus.BAD_REQUEST;
-		}		
+		}
 		
+		return new ResponseEntity<>(status);
 	}
 }

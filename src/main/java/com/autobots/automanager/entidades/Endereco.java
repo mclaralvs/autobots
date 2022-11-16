@@ -1,23 +1,20 @@
 package com.autobots.automanager.entidades;
 
-import java.util.Date;
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-import lombok.Data;
+import org.springframework.hateoas.RepresentationModel;
+
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@Data
 @Entity
-public class Endereco {
+public class Endereco extends RepresentationModel<Endereco> {
 	
 	@Id()
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

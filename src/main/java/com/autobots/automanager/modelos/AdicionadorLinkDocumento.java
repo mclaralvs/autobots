@@ -10,8 +10,8 @@ import com.autobots.automanager.controles.DocumentoControle;
 import com.autobots.automanager.entidades.Documento;
 
 @Component
-public class AdicionadorLinkDocumento implements AdicionadorLink<Documento>{
-	
+public class AdicionadorLinkDocumento implements AdicionadorLink<Documento> {
+
 	@Override
 	public void adicionarLink(List<Documento> lista) {
 		for (Documento documento : lista) {
@@ -29,8 +29,7 @@ public class AdicionadorLinkDocumento implements AdicionadorLink<Documento>{
 	public void adicionarLink(Documento objeto) {
 		Link linkProprio = WebMvcLinkBuilder
 				.linkTo(WebMvcLinkBuilder
-						.methodOn(DocumentoControle.class)
-						.docs())
+						.methodOn(DocumentoControle.class).docs())
 				.withRel("documentos");
 		objeto.add(linkProprio);
 	}

@@ -14,10 +14,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.autobots.automanager.entidades.Cliente;
+import com.autobots.automanager.entidades.Documento;
 import com.autobots.automanager.entidades.Telefone;
 import com.autobots.automanager.modelos.AdicionadorLink;
 import com.autobots.automanager.modelos.AdicionadorLinkTelefone;
 import com.autobots.automanager.modelos.ClienteSelecionador;
+import com.autobots.automanager.modelos.DocumentoAtualizador;
 import com.autobots.automanager.modelos.TelefoneAtualizador;
 import com.autobots.automanager.modelos.TelefoneSelecionador;
 import com.autobots.automanager.repositorios.TelefoneRepositorio;
@@ -60,7 +62,7 @@ public class TelefoneControle {
 		}
 	}
 	
-	@GetMapping("/telefones/{id}")
+	@GetMapping("/telefone/{id}")
 	public ResponseEntity<Telefone> telefonesCliente(@PathVariable Long id) {
 		List<Telefone> telefones = repositorioTelefone.findAll();
 		
@@ -80,18 +82,18 @@ public class TelefoneControle {
 		}
 	}
 
-	@PutMapping("/cadastrar/{id}") // só pra atualizacao
-	public ResponseEntity<?> cadastrarTelefone(@PathVariable long id, @RequestBody Telefone atualizacao) {
+	@PutMapping("/cadastrar") // só pra atualizacao
+	public ResponseEntity<?> cadastrarTelefone(@RequestBody Cliente atualizacao) {
 		HttpStatus status = HttpStatus.CONFLICT;
 		
-		Telefone alvo = repositorioTelefone.getById(atualizacao.getId());
+		Cliente alvo = repositorio.getById(atualizacao.getId());
 		
 		TelefoneAtualizador atualizador = new TelefoneAtualizador();
 		
 		if (alvo != null) {
-			atualizador.atualizar(alvo, atualizacao);
+			alvo.getTelefones().addAll(atualizacao.getTelefones());
 			
-			repositorioTelefone.save(alvo);
+			repositorio.save(alvo);
 			
 			status = HttpStatus.OK;
 			
@@ -102,8 +104,39 @@ public class TelefoneControle {
 		return new ResponseEntity<>(status);
 	}
 	
+	@PutMapping("/atualizar/{id}")
+	public ResponseEntity<?> atualizarTelefone(@PathVariable long id, @RequestBody Cliente atualizacao) {
+		HttpStatus status = HttpStatus.CONFLICT;
+
+		Cliente alvo = repositorio.getById(atualizacao.getId());
+
+		List<Telefone> telefones= alvo.getTelefones();
+
+		if (alvo != null) {
+
+			for (Telefone telefone : telefones) {
+				if (telefone.getId() == id) {
+					TelefoneAtualizador atualizador = new TelefoneAtualizador();
+					
+					Telefone tel = atualizacao.getTelefones().get(0);
+					
+					atualizador.atualizar(telefone, tel);
+				}
+			}
+
+			repositorio.save(alvo);
+			
+			status = HttpStatus.OK;
+
+		} else {
+			status = HttpStatus.BAD_REQUEST;
+		}
+
+		return new ResponseEntity<>(status);
+	}
+	
 	@DeleteMapping("/excluir/{id}")
-	public void excluirDocumento(@PathVariable long id, @RequestBody Cliente exclusao) {
+	public ResponseEntity<?> excluirDocumento(@PathVariable long id, @RequestBody Cliente exclusao) {
 		HttpStatus status = HttpStatus.CONFLICT;
 		
 		Cliente alvo = repositorio.getById(id); // informar o id por json
@@ -123,11 +156,8 @@ public class TelefoneControle {
 			repositorio.save(alvo); // atualiza no banco
 			
 			status = HttpStatus.OK;
-			
-		} else {
-			status = HttpStatus.BAD_REQUEST;
-		}
+		} 
 		
-
+		return new ResponseEntity<>(status);
 	}
 }
