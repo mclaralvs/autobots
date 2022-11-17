@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.autobots.automanager.entidades.Cliente;
 import com.autobots.automanager.entidades.Documento;
+import com.autobots.automanager.modelo.DocumentoAtualizador;
 import com.autobots.automanager.repositorios.ClienteRepositorio;
 import com.autobots.automanager.repositorios.DocumentoRepositorio;
 
@@ -38,13 +39,36 @@ public class DocumentoControle {
 		return alvo.getDocumentos();
 	}
 	
-	@PutMapping("/cadastrar/{id}") // só pra atualizacao
-	public void cadastrarDocumento(@PathVariable long id, @RequestBody Cliente atualizacao) {
-		Cliente alvo = repositorio.getById(id);
+	@PutMapping("/cadastrar")
+	public void cadastrarDocumento(@RequestBody Cliente atualizacao) {
+		Cliente alvo = repositorio.getById(atualizacao.getId());
+
+		DocumentoAtualizador atualizador = new DocumentoAtualizador();
+		
 		alvo.getDocumentos().addAll(atualizacao.getDocumentos());
+
 		repositorio.save(alvo);
 	}
 
+	@PutMapping("/atualizar/{id}")
+	public void atualizarDocumento(@PathVariable long id, @RequestBody Cliente atualizacao) {
+		Cliente alvo = repositorio.getById(atualizacao.getId());
+
+		List<Documento> documentos = alvo.getDocumentos();
+
+		for (Documento documento : documentos) {
+			if (documento.getId() == id) {
+				DocumentoAtualizador atualizador = new DocumentoAtualizador();
+				
+				Documento doc = atualizacao.getDocumentos().get(0);
+				
+				atualizador.atualizar(documento, doc);
+			}
+		}
+
+		repositorio.save(alvo);
+	}
+	
 	@DeleteMapping("/excluir/{id}")
 	public void excluirDocumento(@PathVariable long id, @RequestBody Cliente exclusao) {
 		Cliente alvo = repositorio.getById(id); 

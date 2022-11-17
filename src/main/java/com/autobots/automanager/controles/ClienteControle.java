@@ -30,12 +30,14 @@ public class ClienteControle {
 	@GetMapping("/clientes")
 	public List<Cliente> obterClientes() {
 		List<Cliente> clientes = repositorio.findAll();
+		
 		return clientes;
 	}
 
 	@GetMapping("/cliente/{id}")
 	public Cliente obterCliente(@PathVariable long id) {
 		List<Cliente> clientes = repositorio.findAll();
+		
 		return selecionador.selecionar(clientes, id);
 	}
 
@@ -44,18 +46,21 @@ public class ClienteControle {
 		repositorio.save(cliente);
 	}
 
-	@PutMapping("/atualizar/{id}")
+	@PutMapping("/atualizar")
 	public void atualizarCliente(@PathVariable long id, @RequestBody Cliente atualizacao) {
-		Cliente cliente = repositorio.getById(id);
+		Cliente alvo = repositorio.getById(atualizacao.getId());
+		
 		ClienteAtualizador atualizador = new ClienteAtualizador();
-		atualizador.atualizar(cliente, atualizacao);
-		repositorio.save(cliente);
+		
+		atualizador.atualizar(alvo, atualizacao);
+		
+		repositorio.save(alvo);
 	}
 
 	@DeleteMapping("/excluir/{id}")
 	public void excluirCliente(@PathVariable long id) {
 		Cliente cliente = repositorio.getById(id);
+		
 		repositorio.delete(cliente);
 	}
-	
 }

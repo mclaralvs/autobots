@@ -32,20 +32,29 @@ public class EnderecoControle {
 		return repositorioEndereco.findAll();
 	}
 	
-	@GetMapping("/enderecos/{id}")
+	@GetMapping("/endereco/{id}")
 	public Endereco enderecosCliente(@PathVariable long id) {
 		return repositorioEndereco.findById(id).get();
 	}
 	
 	@PutMapping("/cadastrar/{id}") // só pra atualizacao
-	public void cadastrarEndereco(@PathVariable long id, @RequestBody Endereco atualizacao) {
-		Endereco alvo = repositorioEndereco.getById(atualizacao.getId());
+	public void cadastrarEndereco(@PathVariable long id, @RequestBody Cliente atualizacao) {
+		Cliente alvo = repositorio.getById(id);
 		
-		EnderecoAtualizador atualizador = new EnderecoAtualizador();
+		if (alvo.getEndereco() == null) {
+			alvo.setEndereco(atualizacao.getEndereco());
+			
+			repositorio.save(alvo);
+		}
+	}
+	
+	@PutMapping("/atualizar/{id}") // só pra atualizacao
+	public void atualizarEndereco(@PathVariable long id, @RequestBody Cliente atualizacao) {
+		Cliente alvo = repositorio.getById(id);
 		
-		atualizador.atualizar(alvo, atualizacao);
+		alvo.setEndereco(atualizacao.getEndereco());
 		
-		repositorioEndereco.save(alvo);
+		repositorio.save(alvo);
 	}
 	
 	@DeleteMapping("/excluir/{id}")

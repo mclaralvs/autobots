@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.autobots.automanager.entidades.Cliente;
 import com.autobots.automanager.entidades.Telefone;
+import com.autobots.automanager.modelo.TelefoneAtualizador;
 import com.autobots.automanager.repositorios.TelefoneRepositorio;
 import com.autobots.automanager.repositorios.ClienteRepositorio;
 
@@ -34,29 +35,39 @@ public class TelefoneControle {
 	@GetMapping("/telefones/{id}")
 	public List<Telefone> telefonesCliente(@PathVariable Long id) {
 		Cliente alvo = repositorio.getById(id);
+		
 		return alvo.getTelefones();
 	}
 
-	@PutMapping("/cadastrar/{id}") // só pra atualizacao
-	public void cadastrarTelefone(@PathVariable long id, @RequestBody Cliente atualizacao) {
-		Cliente alvo = repositorio.getById(id);
+	@PutMapping("/cadastrar") // só pra atualizacao
+	public void cadastrarTelefone(@RequestBody Cliente atualizacao) {
+		Cliente alvo = repositorio.getById(atualizacao.getId());
+		
+		TelefoneAtualizador atualizador = new TelefoneAtualizador();
+		
 		alvo.getTelefones().addAll(atualizacao.getTelefones());
+		
 		repositorio.save(alvo);
 	}
 	
-	/*@PutMapping("/atualizar")
-	public void atualizarTelefone(@RequestBody Cliente atualizacao) {
+	@PutMapping("/atualizar/{id}")
+	public void atualizarTelefone(@PathVariable long id, @RequestBody Cliente atualizacao) {
 		Cliente alvo = repositorio.getById(atualizacao.getId());
-		
-		List<Telefone> telefones =  alvo.getTelefones();
-		
-		for (Telefone telefone: telefones) {
-			if (telefone.getId() ==  )
-			TelefoneAtualizador atualizador = new TelefoneAtualizador();
-			atualizador.atualizar(telefone, atualizarTelefone(atualizacao));
-		}		
+
+		List<Telefone> telefones= alvo.getTelefones();
+
+		for (Telefone telefone : telefones) {
+			if (telefone.getId() == id) {
+				TelefoneAtualizador atualizador = new TelefoneAtualizador();
+					
+				Telefone tel = atualizacao.getTelefones().get(0);
+					
+				atualizador.atualizar(telefone, tel);
+			}
+		}
+
 		repositorio.save(alvo);
-	}*/
+	}
 	
 	@DeleteMapping("/excluir/{id}")
 	public void excluirDocumento(@PathVariable long id, @RequestBody Cliente exclusao) {
