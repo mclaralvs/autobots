@@ -80,21 +80,40 @@ public class EnderecoControle {
 		}
 	}
 	
-	@PutMapping("/cadastrar/{id}") // só pra atualizacao
-	public ResponseEntity<?> cadastrarEndereco(@PathVariable long id, @RequestBody Cliente cliente) {
+	@PutMapping("/cadastrar") // só pra atualizacao
+	public ResponseEntity<?> cadastrarEndereco(@RequestBody Cliente atualizacao) {
 		HttpStatus status = HttpStatus.CONFLICT;
 		
-		Cliente alvo = repositorio.getById(id);
+		Cliente alvo = repositorio.getById(atualizacao.getId());
 		
 		if (alvo.getEndereco() == null) {
-			alvo.setEndereco(cliente.getEndereco());
+			alvo.setEndereco(atualizacao.getEndereco());
 			
 			repositorio.save(alvo);
 			
 			status = HttpStatus.OK;
 			
 		} else {
-			status = HttpStatus.CONFLICT;
+			status = HttpStatus.BAD_REQUEST;
+		}
+		
+		return new ResponseEntity<>(status);
+	}
+	
+	@PutMapping("/atualizar") // só pra atualizacao
+	public ResponseEntity<?> atualizarEndereco(@RequestBody Cliente atualizacao) {
+		HttpStatus status = HttpStatus.CONFLICT;
+		
+		Cliente alvo = repositorio.getById(atualizacao.getId());
+		
+		if (alvo.getEndereco() != null) {
+			alvo.setEndereco(atualizacao.getEndereco());
+			
+			repositorio.save(alvo);
+			
+			status = HttpStatus.OK;
+		} else {
+			status = HttpStatus.BAD_REQUEST;
 		}
 		
 		return new ResponseEntity<>(status);

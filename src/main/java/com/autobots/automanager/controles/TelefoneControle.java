@@ -105,29 +105,21 @@ public class TelefoneControle {
 	}
 	
 	@PutMapping("/atualizar/{id}")
-	public ResponseEntity<?> atualizarTelefone(@PathVariable long id, @RequestBody Cliente atualizacao) {
+	public ResponseEntity<?> atualizarTelefone(@PathVariable long id, @RequestBody Telefone atualizacao) {
 		HttpStatus status = HttpStatus.CONFLICT;
 
-		Cliente alvo = repositorio.getById(atualizacao.getId());
-
-		List<Telefone> telefones= alvo.getTelefones();
-
+		Telefone alvo = repositorioTelefone.getById(id);
+		
 		if (alvo != null) {
-
-			for (Telefone telefone : telefones) {
-				if (telefone.getId() == id) {
-					TelefoneAtualizador atualizador = new TelefoneAtualizador();
-					
-					Telefone tel = atualizacao.getTelefones().get(0);
-					
-					atualizador.atualizar(telefone, tel);
-				}
-			}
-
-			repositorio.save(alvo);
+			TelefoneAtualizador atualizador = new TelefoneAtualizador();
+							
+			//Telefone tel = atualizacao.getTelefones().get(0);
+				
+			atualizador.atualizar(alvo, atualizacao);
+			
+			repositorioTelefone.save(alvo);
 			
 			status = HttpStatus.OK;
-
 		} else {
 			status = HttpStatus.BAD_REQUEST;
 		}
@@ -139,14 +131,14 @@ public class TelefoneControle {
 	public ResponseEntity<?> excluirDocumento(@PathVariable long id, @RequestBody Cliente exclusao) {
 		HttpStatus status = HttpStatus.CONFLICT;
 		
-		Cliente alvo = repositorio.getById(id); // informar o id por json
+		Cliente alvo = repositorio.getById(exclusao.getId()); // informar o id por json
 		
 		if (alvo != null) {
 			List<Telefone> telefones =  alvo.getTelefones(); //pega todos os documentos e salva numa variável
 			
 			for (Telefone telefone: telefones) { // vai percorrer pela variável inteira
 			
-				if (telefone.getId() == exclusao.getTelefones().get(0).getId()) {
+				if (telefone.getId() == id) {
 					alvo.getTelefones().remove(telefone);
 				
 					break;

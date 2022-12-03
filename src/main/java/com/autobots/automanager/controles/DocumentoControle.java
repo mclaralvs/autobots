@@ -105,7 +105,7 @@ public class DocumentoControle {
 	}
 
 	@PutMapping("/atualizar/{id}")
-	public ResponseEntity<?> atualizarDocumento(@PathVariable long id, @RequestBody Cliente atualizacao) {
+	public ResponseEntity<?> atualizarDocumento(@PathVariable long id, @RequestBody Documento atualizacao) {
 		HttpStatus status = HttpStatus.CONFLICT;
 
 		Cliente alvo = repositorio.getById(atualizacao.getId());
@@ -118,9 +118,9 @@ public class DocumentoControle {
 				if (documento.getId() == id) {
 					DocumentoAtualizador atualizador = new DocumentoAtualizador();
 					
-					Documento doc = atualizacao.getDocumentos().get(0);
+					//Documento doc = atualizacao.getDocumentos().get(0);
 					
-					atualizador.atualizar(documento, doc);
+					atualizador.atualizar(documento, atualizacao);
 				}
 			}
 
@@ -139,14 +139,14 @@ public class DocumentoControle {
 	public ResponseEntity<?> excluirDocumento(@PathVariable long id, @RequestBody Cliente exclusao) {
 		HttpStatus status = HttpStatus.BAD_REQUEST;
 
-		Cliente alvo = repositorio.getById(id);
+		Cliente alvo = repositorio.getById(exclusao.getId()); 
 
 		if (alvo != null) {
 			List<Documento> documentos = alvo.getDocumentos(); // pega todos os documentos e salva numa variável
 
 			for (Documento documento : documentos) { // vai percorrer pela variável inteira
 
-				if (documento.getId() == exclusao.getDocumentos().get(0).getId()) {
+				if (documento.getId() == id) {
 					alvo.getDocumentos().remove(documento);
 
 					break;
