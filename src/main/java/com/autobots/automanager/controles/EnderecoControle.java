@@ -34,12 +34,13 @@ public class EnderecoControle {
 	
 	@GetMapping("/endereco/{id}")
 	public Endereco enderecosCliente(@PathVariable long id) {
-		return repositorioEndereco.findById(id).get();
+		Cliente alvo = repositorio.getById(id);
+		return alvo.getEndereco();
 	}
 	
-	@PutMapping("/cadastrar/{id}") // só pra atualizacao
-	public void cadastrarEndereco(@PathVariable long id, @RequestBody Cliente atualizacao) {
-		Cliente alvo = repositorio.getById(id);
+	@PutMapping("/cadastrar") // só pra atualizacao
+	public void cadastrarEndereco(@RequestBody Cliente atualizacao) {
+		Cliente alvo = repositorio.getById(atualizacao.getId());
 		
 		if (alvo.getEndereco() == null) {
 			alvo.setEndereco(atualizacao.getEndereco());
@@ -48,18 +49,18 @@ public class EnderecoControle {
 		}
 	}
 	
-	@PutMapping("/atualizar/{id}") // só pra atualizacao
-	public void atualizarEndereco(@PathVariable long id, @RequestBody Cliente atualizacao) {
-		Cliente alvo = repositorio.getById(id);
+	@PutMapping("/atualizar") // só pra atualizacao
+	public void atualizarEndereco(@RequestBody Cliente atualizacao) {
+		Cliente alvo = repositorio.getById(atualizacao.getId());
 		
 		alvo.setEndereco(atualizacao.getEndereco());
 		
 		repositorio.save(alvo);
 	}
 	
-	@DeleteMapping("/excluir/{id}")
-	public void excluirEndereco(@PathVariable long id, @RequestBody Cliente exclusao) {
-		Cliente alvo = repositorio.getById(id); 
+	@DeleteMapping("/excluir")
+	public void excluirEndereco(@RequestBody Cliente exclusao) {
+		Cliente alvo = repositorio.getById(exclusao.getId()); 
 		
 		repositorioEndereco.delete(alvo.getEndereco());
 		

@@ -46,7 +46,7 @@ public class ClienteControle {
 		repositorio.save(cliente);
 	}
 
-	@PutMapping("/atualizar")
+	@PutMapping("/atualizar/{id}")
 	public void atualizarCliente(@PathVariable long id, @RequestBody Cliente atualizacao) {
 		Cliente alvo = repositorio.getById(atualizacao.getId());
 		

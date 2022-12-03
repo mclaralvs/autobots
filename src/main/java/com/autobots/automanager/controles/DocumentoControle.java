@@ -43,7 +43,7 @@ public class DocumentoControle {
 	public void cadastrarDocumento(@RequestBody Cliente atualizacao) {
 		Cliente alvo = repositorio.getById(atualizacao.getId());
 
-		DocumentoAtualizador atualizador = new DocumentoAtualizador();
+		//DocumentoAtualizador atualizador = new DocumentoAtualizador();
 		
 		alvo.getDocumentos().addAll(atualizacao.getDocumentos());
 
@@ -51,7 +51,7 @@ public class DocumentoControle {
 	}
 
 	@PutMapping("/atualizar/{id}")
-	public void atualizarDocumento(@PathVariable long id, @RequestBody Cliente atualizacao) {
+	public void atualizarDocumento(@PathVariable long id, @RequestBody Documento atualizacao) {
 		Cliente alvo = repositorio.getById(atualizacao.getId());
 
 		List<Documento> documentos = alvo.getDocumentos();
@@ -60,9 +60,9 @@ public class DocumentoControle {
 			if (documento.getId() == id) {
 				DocumentoAtualizador atualizador = new DocumentoAtualizador();
 				
-				Documento doc = atualizacao.getDocumentos().get(0);
+				//Documento doc = atualizacao.getDocumentos().get(0);
 				
-				atualizador.atualizar(documento, doc);
+				atualizador.atualizar(documento, atualizacao);
 			}
 		}
 
@@ -71,12 +71,12 @@ public class DocumentoControle {
 	
 	@DeleteMapping("/excluir/{id}")
 	public void excluirDocumento(@PathVariable long id, @RequestBody Cliente exclusao) {
-		Cliente alvo = repositorio.getById(id); 
+		Cliente alvo = repositorio.getById(exclusao.getId()); 
 		
 		List<Documento> documentos =  alvo.getDocumentos(); //pega todos os documentos e salva numa variável
 		
 		for (Documento documento : documentos) { // vai percorrer pela variável inteira
-			if (documento.getId() == exclusao.getDocumentos().get(0).getId()) {
+			if (documento.getId() == id) {
 				alvo.getDocumentos().remove(documento);
 				break;
 			}

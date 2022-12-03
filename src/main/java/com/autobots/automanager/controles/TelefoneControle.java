@@ -39,7 +39,7 @@ public class TelefoneControle {
 		return alvo.getTelefones();
 	}
 
-	@PutMapping("/cadastrar") // só pra atualizacao
+	@PutMapping("/cadastrar")
 	public void cadastrarTelefone(@RequestBody Cliente atualizacao) {
 		Cliente alvo = repositorio.getById(atualizacao.getId());
 		
@@ -51,18 +51,18 @@ public class TelefoneControle {
 	}
 	
 	@PutMapping("/atualizar/{id}")
-	public void atualizarTelefone(@PathVariable long id, @RequestBody Cliente atualizacao) {
+	public void atualizarTelefone(@PathVariable long id, @RequestBody Telefone atualizacao) {
 		Cliente alvo = repositorio.getById(atualizacao.getId());
 
-		List<Telefone> telefones= alvo.getTelefones();
+		List<Telefone> telefones = alvo.getTelefones();
 
 		for (Telefone telefone : telefones) {
 			if (telefone.getId() == id) {
 				TelefoneAtualizador atualizador = new TelefoneAtualizador();
 					
-				Telefone tel = atualizacao.getTelefones().get(0);
+				//Telefone tel = atualizacao.getTelefones().get(0);
 					
-				atualizador.atualizar(telefone, tel);
+				atualizador.atualizar(telefone, atualizacao);
 			}
 		}
 
@@ -71,16 +71,12 @@ public class TelefoneControle {
 	
 	@DeleteMapping("/excluir/{id}")
 	public void excluirDocumento(@PathVariable long id, @RequestBody Cliente exclusao) {
-		Cliente alvo = repositorio.getById(id); // informar o id por json
+		Telefone alvo = repositorioTelefone.getById(id);
 		
-		List<Telefone> telefones =  alvo.getTelefones(); //pega todos os documentos e salva numa variável
+		Cliente cliente = repositorio.getById(exclusao.getId());
 		
-		for (Telefone telefone: telefones) { // vai percorrer pela variável inteira
-			if (telefone.getId() == exclusao.getTelefones().get(0).getId()) {
-				alvo.getTelefones().remove(telefone);
-				break;
-			}
-		}
-		repositorio.save(alvo); // atualiza no banco
+		cliente.getTelefones().remove(alvo);
+		
+		repositorioTelefone.delete(alvo);
 	}
 }
